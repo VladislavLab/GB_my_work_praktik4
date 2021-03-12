@@ -1,10 +1,11 @@
 package my_project;
 
-
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
 public class task4 {
+
     public static int i, j;
     public static int SIZE = 5;
     public static int DOTS_TO_WIN = 4;
@@ -109,50 +110,114 @@ public class task4 {
         return true;
     }
 
-    public static void aiTurn() {
-        int x = 1;
-        int y = 1;
-        boolean ai_win = false;
-        boolean user_win = false;
+//    public static void aiTurn() {
+//        int x = 1;
+//        int y = 1;
+//        boolean ai_win = false;
+//        boolean user_win = false;
 
         // Блокировка хода пользователя, если он побеждает на следующем ходу
 
-        if (!ai_win) {
-            for (int i = 0; i < SIZE; i++) {
-                for (int j = 0; j < SIZE; j++) {
-                    if (!isCellValid(i, j)) {
-                        map[i][j] = DOT_X;
-                        if (checkWin(DOT_X)) {
-                            x = i;
-                            y = j;
-                            user_win = true;
+//        if (!ai_win) {
+//            for (int i = 0; i < SIZE; i++) {
+//                for (int j = 0; j < SIZE; j++) {
+//                    if (!isCellValid(i, j)) {
+//                        map[i][j] = DOT_X;
+//                        if (checkWin(DOT_X)) {
+//                            x = i;
+//                            y = j;
+//                            user_win = true;
+//                        }
+//                        map[i][j] = DOT_O;
+//                    }
+//                }
+//            }
+//        }
+//
+//        if (ai_win && user_win) {
+//            do {
+//                x = rand.nextInt(SIZE);
+//                y = rand.nextInt(SIZE);
+//            } while (!isCellValid(x, y));
+//            System.out.println("Компьютер походил в точку " + (x + 1) + " " + (y + 1));
+//            map[y][x] = DOT_O;
+//        } }
+
+
+    public static void aiTurn() {
+        int x, y;
+        int[] blockingXY = getBlockingXY();
+        System.out.println(Arrays.toString(blockingXY));
+        if (blockingXY.length == 2) {
+            y = blockingXY[0];
+            x = blockingXY[1];
+        } else {
+            do {
+                y = rand.nextInt(SIZE);
+                x = rand.nextInt(SIZE);
+            } while (!isCellValid(x, y));
+        }
+
+        System.out.println("Компьютер походил в точку " + (x + 1) + " " + (y + 1));
+        map[y][x] = DOT_O;
+    }
+
+    public static int[] getBlockingXY() {
+        char symb = DOT_X;
+
+        int mainDiagonal = 0;
+        int sideDiagonal = 0;
+        int lastIndex = map.length - 1;
+        for (int i = 0; i < map.length; i++) {
+
+            int rowCount = 0;
+            int columnCount = 0;
+
+            for (int j = 0; j < map.length; j++) {
+
+                if (map[i][j] == symb && (++rowCount + 1) == DOTS_TO_WIN) {
+
+                    for (int l = 0; l < map.length; l++) {
+                        if (isCellValid(l, i)) {
+                            return new int[]{i, l};
                         }
-                        map[i][j] = DOT_O;
+                    }
+
+                }
+
+                if (map[j][i] == symb && (++columnCount + 1) == DOTS_TO_WIN) {
+
+                    for (int l = 0; l < map.length; l++) {
+                        if (isCellValid(i, l)) {
+                            return new int[]{l, i};
+                        }
+                    }
+
+                }
+            }
+
+            if (map[i][i] == symb && (++mainDiagonal + 1) == DOTS_TO_WIN) {
+                for (int l = 0; l < map.length; l++) {
+                    if (isCellValid(l, l)) {
+                        return new int[]{l, l};
+                    }
+                }
+            }
+
+            if (map[i][lastIndex - i] == symb && (++sideDiagonal + 1) == DOTS_TO_WIN) {
+                for (int l = 0; l < map.length; l++) {
+                    if (isCellValid(lastIndex - l, l)) {
+                        return new int[]{l, lastIndex - l};
                     }
                 }
             }
         }
 
-        if (ai_win && user_win) {
-            do {
-                x = rand.nextInt(SIZE);
-                y = rand.nextInt(SIZE);
-            } while (!isCellValid(x, y));
-            System.out.println("Компьютер походил в точку " + (x + 1) + " " + (y + 1));
-            map[y][x] = DOT_O;
-        }
-
-
-//        int x, y;
-//        do {
-//            x = rand.nextInt(SIZE);
-//            y = rand.nextInt(SIZE);
-//        } while (!isCellValid(x, y));
-//       System.out.println("Компьютер походил в точку " + (x + 1) + " " + (y + 1));
-//        map[y][x] = DOT_O;}
+        return new int[0];
     }
 
-    public static void humanTurn() {
+public static void humanTurn() {
+
         int x, y;
         do {
             System.out.println("Введите координаты в формате X Y");
